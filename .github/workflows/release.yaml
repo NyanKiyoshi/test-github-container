@@ -16,7 +16,7 @@ jobs:
         id: prep
         run: |
           # The name of the owner and of the repository: owner/repository
-          IMAGE_NAME=${{ github.repository }}
+          IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
 
           if [[ $GITHUB_REF != refs/tags/v* ]]; then
             echo "Build aborted, invalid tag received from '$GITHUB_REF'" >&2
@@ -70,7 +70,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          username: ${{ secrets.CR_USERNAME }}
           password: ${{ secrets.CR_PAT }}
 
       - name: Build and Push
