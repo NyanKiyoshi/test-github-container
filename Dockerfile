@@ -1,0 +1,2 @@
+# Dummy image
+FROM scratch
