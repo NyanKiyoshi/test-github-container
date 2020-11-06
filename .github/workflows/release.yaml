@@ -45,19 +45,19 @@ jobs:
             NAMED_VERSION="snapshot"
           fi
 
-          TAGS=$"
+          TAGS=$"\
           ghcr.io/${{ steps.image.outputs.image_name }}:latest,\
           ghcr.io/${{ steps.image.outputs.image_name }}:${VERSION}\
           "
 
           # Output the target tags
-          echo -n "${TAGS}" > /tmp/container-tags
+          echo "CONTAINER_TAGS=${TAGS}" >> "${GITHUB_ENV}"
 
       # Outputs the containers tags for staging branches
       # Only publishes them onto Docker Hub
       - name: Prepare Tags for Staging
         id: staging
-        if: ${{ startsWith(github.ref, 'refs/heads/v') }}
+        if: ${{ startsWith(github.ref, 'refs/heads/') }}
         run: |
           # Version name is the branch name
           NAMED_VERSION=${GITHUB_REF#refs/heads/}
@@ -65,13 +65,13 @@ jobs:
 
           # Target Docker Hub with the SHA value
           # and branch name
-          TAGS=$"
+          TAGS=$"\
           ${{ steps.image.outputs.image_name }}:${NAMED_VERSION},\
           ${{ steps.image.outputs.image_name }}:${SHA}\
           "
 
           # Output the target tags
-          echo -n "${TAGS}" > /tmp/container-tags
+          echo "CONTAINER_TAGS=${TAGS}" >> "${GITHUB_ENV}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -112,7 +112,7 @@ jobs:
           context: ./
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: $(cat /tmp/container-tags)
+          tags: ${{ env.CONTAINER_TAGS }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
@@ -120,4 +120,4 @@ jobs:
         run: |
           echo $"\
             Digest: ${{ steps.docker_build.outputs.digest }}
-            Tags: ${{ steps.tagged.outputs.tags }},${{ steps.staging.outputs.tags }}"
+            Tags: ${{ env.CONTAINER_TAGS }}"
