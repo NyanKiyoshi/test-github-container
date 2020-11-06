@@ -51,7 +51,7 @@ jobs:
           "
 
           # Output the target tags
-          echo ::set-output name=tags::${TAGS}
+          echo -n "${TAGS}" > /tmp/container-tags
 
       # Outputs the containers tags for staging branches
       # Only publishes them onto Docker Hub
@@ -71,7 +71,7 @@ jobs:
           "
 
           # Output the target tags
-          echo ::set-output name=tags::${TAGS}
+          echo -n "${TAGS}" > /tmp/container-tags
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -112,7 +112,7 @@ jobs:
           context: ./
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: $(cat /tmp/container-tags)
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
