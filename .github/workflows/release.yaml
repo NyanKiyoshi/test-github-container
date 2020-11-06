@@ -29,8 +29,8 @@ jobs:
       # Tags stable versions as :latest
       # Pre-releases, alphas, etc. as :snapshot
       - name: Prepare Image Tags from Git Tag
-        id: tags
-        if: ${{ $GITHUB_REF == refs/tags/* }}
+        id: tagged
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         run: |
           # Remove everything else than the tagged version
           VERSION=${GITHUB_REF#refs/tags/v}
@@ -56,12 +56,12 @@ jobs:
       # Outputs the containers tags for staging branches
       # Only publishes them onto Docker Hub
       - name: Prepare Tags for Staging
-        id: tags
-        if: ${{ $GITHUB_REF == refs/heads/* }}
+        id: staging
+        if: ${{ startsWith(github.ref, 'refs/heads/v') }}
         run: |
           # Version name is the branch name
           NAMED_VERSION=${GITHUB_REF#refs/heads/}
-          SHA=${{ GITHUB_SHA }}
+          SHA=${GITHUB_SHA}
 
           # Target Docker Hub with the SHA value
           # and branch name
@@ -120,4 +120,4 @@ jobs:
         run: |
           echo $"\
             Digest: ${{ steps.docker_build.outputs.digest }}
-            Tags: ${{ steps.tags.outputs.tags }},${{ steps.tags.outputs.tags }}"
+            Tags: ${{ steps.tagged.outputs.tags }},${{ steps.staging.outputs.tags }}"
