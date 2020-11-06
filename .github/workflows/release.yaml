@@ -51,7 +51,9 @@ jobs:
           "
 
           # Output the target tags
-          echo "CONTAINER_TAGS=${TAGS}" >> "${GITHUB_ENV}"
+          echo "
+          CONTAINER_TAGS=${TAGS}
+          NAMED_VERSION=${NAMED_VERSION}" >> "${GITHUB_ENV}"
 
       # Outputs the containers tags for staging branches
       # Only publishes them onto Docker Hub
@@ -67,11 +69,13 @@ jobs:
           # and branch name
           TAGS=$"\
           ${{ steps.image.outputs.image_name }}:${NAMED_VERSION},\
-          ${{ steps.image.outputs.image_name }}:${SHA}\
+          ${{ steps.image.outputs.image_name }}:sha-${SHA}\
           "
 
           # Output the target tags
-          echo "CONTAINER_TAGS=${TAGS}" >> "${GITHUB_ENV}"
+          echo "
+          CONTAINER_TAGS=${TAGS}
+          NAMED_VERSION=${NAMED_VERSION}" >> "${GITHUB_ENV}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -115,6 +119,9 @@ jobs:
           tags: ${{ env.CONTAINER_TAGS }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+          build-args: |
+            VERSION=${{ env.NAMED_VERSION }}
+            COMMIT_ID=${{ github.sha }}
 
       - name: Image digest
         run: |
