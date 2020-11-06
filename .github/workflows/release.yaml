@@ -1,4 +1,4 @@
-name: Publish Release
+name: Publish
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
           fi
 
           TAGS=$"\
-          ghcr.io/${{ steps.image.outputs.image_name }}:latest,\
+          ghcr.io/${{ steps.image.outputs.image_name }}:${NAMED_VERSION},\
           ghcr.io/${{ steps.image.outputs.image_name }}:${VERSION}\
           "
 
