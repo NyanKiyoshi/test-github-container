@@ -75,14 +75,15 @@ jobs:
           ${{ steps.image.outputs.image_name }}:sha-${SHA}\
           "
 
-          # Output the target tags
-          echo "
-          CONTAINER_TAGS=${TAGS}
-
           # Set version name for open-containers version label as:
           # <branch>-<drift>-<7-digit-hash>
           NAMED_VERSION=$(git describe --all --long | tr -d $'\n')
-          NAMED_VERSION=${NAMED_VERSION}" >> "${GITHUB_ENV}"
+
+          # Output the target tags
+          echo "
+          CONTAINER_TAGS='${TAGS}'
+          NAMED_VERSION='${NAMED_VERSION}'
+          " >> "${GITHUB_ENV}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
