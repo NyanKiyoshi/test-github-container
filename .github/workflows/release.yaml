@@ -64,19 +64,21 @@ jobs:
         run: |
           # Version name is the branch name
           # Slashes are substitued by dashes
-          NAMED_VERSION=$(echo ${GITHUB_REF#refs/heads/} | tr / -)
+          CLEAN_BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)
           SHA=${GITHUB_SHA}
 
           # Target Docker Hub with the SHA value
           # and branch name
           TAGS=$"\
-          ${{ steps.image.outputs.image_name }}:${NAMED_VERSION},\
+          ${{ steps.image.outputs.image_name }}:${CLEAN_BRANCH_NAME},\
           ${{ steps.image.outputs.image_name }}:sha-${SHA}\
           "
 
           # Output the target tags
           echo "
           CONTAINER_TAGS=${TAGS}
+
+          NAMED_VERSION=$(git describe --all --long)
           NAMED_VERSION=${NAMED_VERSION}" >> "${GITHUB_ENV}"
 
       - name: Set up QEMU
