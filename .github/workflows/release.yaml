@@ -62,6 +62,7 @@ jobs:
         id: staging
         if: ${{ startsWith(github.ref, 'refs/heads/') }}
         run: |
+          set -x
           # Version name is the branch name
           # Slashes are substitued by dashes
           CLEAN_BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)
